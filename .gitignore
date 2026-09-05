@@ -1,0 +1,14 @@
+venv/
+__pycache__/
+*.pyc
+.env
+node_modules/
+log.html
+report.html
+output.xml
+playwright-log.txt
+selenium-screenshot-*.png
+.pabotsuitenames
+pabot_results/
+results/
+*.db
