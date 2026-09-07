@@ -12,3 +12,9 @@ selenium-screenshot-*.png
 pabot_results/
 results/
 *.db
+
+# Mosquitto runtime data
+mosquitto/data/*
+mosquitto/log/*
+!mosquitto/data/.gitkeep
+!mosquitto/log/.gitkeep
