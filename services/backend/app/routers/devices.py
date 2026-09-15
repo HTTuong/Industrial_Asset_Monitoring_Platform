@@ -28,3 +28,14 @@ def register_device(device: schemas.DeviceCreate, db: Session = Depends(get_db))
     db.refresh(new_device)
     return new_device
 
+@router.patch("/{device_id}/deactivate", response_model=schemas.DeviceResponse)
+def deactivate_device(device_id: str, db: Session = Depends(get_db)):
+    device = db.query(models.Device).filter(models.Device.device_id == device_id).first()
+    if not device:
+        raise HTTPException(status_code=404, detail=f"Device '{device_id}' not found")
+
+    device.status = "inactive"
+    db.commit()
+    db.refresh(device)
+    return device
+
