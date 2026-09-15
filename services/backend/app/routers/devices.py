@@ -9,6 +9,13 @@ router = APIRouter(prefix="/devices", tags=["devices"])
 def list_devices(db: Session = Depends(get_db)):
     return db.query(models.Device).all()
 
+@router.get("/{device_id}", response_model=schemas.DeviceResponse)
+def get_device(device_id: str, db: Session = Depends(get_db)):
+    device = db.query(models.Device).filter(models.Device.device_id == device_id).first()
+    if not device:
+        raise HTTPException(status_code=404, detail=f"Device '{device_id}' not found")
+    return device
+
 @router.post("", response_model=schemas.DeviceResponse, status_code=201)
 def register_device(device: schemas.DeviceCreate, db: Session = Depends(get_db)):
     existing = db.query(models.Device).filter(models.Device.device_id == device.device_id).first()
