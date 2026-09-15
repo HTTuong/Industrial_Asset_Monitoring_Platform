@@ -5,6 +5,10 @@ from app import models, schemas
 
 router = APIRouter(prefix="/devices", tags=["devices"])
 
+@router.get("", response_model=list[schemas.DeviceResponse])
+def list_devices(db: Session = Depends(get_db)):
+    return db.query(models.Device).all()
+
 @router.post("", response_model=schemas.DeviceResponse, status_code=201)
 def register_device(device: schemas.DeviceCreate, db: Session = Depends(get_db)):
     existing = db.query(models.Device).filter(models.Device.device_id == device.device_id).first()
@@ -16,3 +20,4 @@ def register_device(device: schemas.DeviceCreate, db: Session = Depends(get_db))
     db.commit()
     db.refresh(new_device)
     return new_device
+
