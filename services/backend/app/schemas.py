@@ -15,3 +15,28 @@ class DeviceResponse(BaseModel):
 
     class Config:
         from_attributes = True  # allow converting directly from SQLAlchemy model
+
+
+class TelemetryCreate(BaseModel):
+    device_id: str = Field(min_length=3, max_length=50)
+    temperature: Optional[float] = None
+    vibration: Optional[float] = None
+    battery: Optional[float] = None
+
+    @field_validator("temperature")
+    @classmethod
+    def temperature_must_be_realistic(cls, v):
+        if v is not None and (v < -50 or v > 200):
+            raise ValueError("temperature out of realistic range (-50 to 200)")
+        return v
+
+class TelemetryResponse(BaseModel):
+    id: int
+    device_id: str
+    temperature: Optional[float]
+    vibration: Optional[float]
+    battery: Optional[float]
+    timestamp: datetime
+
+    class Config:
+        from_attributes = True
