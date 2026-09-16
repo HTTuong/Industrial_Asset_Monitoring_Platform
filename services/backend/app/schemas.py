@@ -29,6 +29,13 @@ class TelemetryCreate(BaseModel):
         if v is not None and (v < -50 or v > 200):
             raise ValueError("temperature out of realistic range (-50 to 200)")
         return v
+    
+    @field_validator("vibration")
+    @classmethod
+    def vibration_must_be_non_negative(cls, v):
+        if v is not None and (v < 0):
+            raise ValueError("vibration cannot be negative")
+        return v
 
 class TelemetryResponse(BaseModel):
     id: int
