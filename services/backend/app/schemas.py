@@ -1,6 +1,6 @@
 from pydantic import BaseModel, Field, field_validator
 from datetime import datetime
-from typing import Optional
+from typing import Optional, Literal
 
 class DeviceCreate(BaseModel):
     device_id: str = Field(min_length=3, max_length=50)
@@ -22,6 +22,7 @@ class TelemetryCreate(BaseModel):
     temperature: Optional[float] = None
     vibration: Optional[float] = None
     battery: Optional[float] = None
+    connectivity: Optional[Literal["good", "weak", "poor"]] = None
 
     @field_validator("temperature")
     @classmethod
@@ -43,6 +44,7 @@ class TelemetryResponse(BaseModel):
     temperature: Optional[float]
     vibration: Optional[float]
     battery: Optional[float]
+    connectivity: Optional[str]
     timestamp: datetime
 
     class Config:

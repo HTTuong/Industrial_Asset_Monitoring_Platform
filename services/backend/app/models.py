@@ -20,6 +20,7 @@ class Telemetry(Base):
     temperature: Mapped[float] = mapped_column(Float, nullable=True)
     vibration: Mapped[float] = mapped_column(Float, nullable=True)
     battery: Mapped[float] = mapped_column(Float, nullable=True)
+    connectivity: Mapped[str] = mapped_column(String(10), nullable=True) 
     timestamp: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
 
 class Alert(Base):

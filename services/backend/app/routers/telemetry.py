@@ -16,6 +16,7 @@ def ingest_telemetry(data: schemas.TelemetryCreate, db: Session = Depends(get_db
         temperature=data.temperature,
         vibration=data.vibration,
         battery=data.battery,
+        connectivity=data.connectivity,
     )
     db.add(new_telemetry)
 
