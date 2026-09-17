@@ -1,11 +1,15 @@
 import paho.mqtt.client as mqtt
 import json
+import time
 import requests
+from collections import deque
 
 BROKER_HOST = "localhost"
 BROKER_PORT = 1883
 SUBSCRIBE_TOPIC = "factory/#"
 BACKEND_URL = "http://localhost:8000"
+
+buffer = deque()
 
 
 def forward_to_backend(reading: dict) -> bool:
@@ -18,7 +22,7 @@ def forward_to_backend(reading: dict) -> bool:
             print(f"Backend rejected ({response.status_code}): {response.text}")
             return False
     except requests.exceptions.ConnectionError:
-        print("Backend unreachable")
+        print("Backend unreachable, will buffer")
         return False
 
 
@@ -34,12 +38,33 @@ def on_message(client, userdata, msg):
         print(f"Malformed JSON on {msg.topic}, dropping message")
         return
 
-    forward_to_backend(reading)
+    success = forward_to_backend(reading)
+    if not success:
+        buffer.append(reading)
+        print(f"Buffered. Queue size: {len(buffer)}")
+
+
+def retry_buffered_messages():
+    while buffer:
+        reading = buffer[0]
+        if forward_to_backend(reading):
+            buffer.popleft()
+            print(f"Retry succeeded. Queue size: {len(buffer)}")
+        else:
+            break 
 
 
 client = mqtt.Client(mqtt.CallbackAPIVersion.VERSION2)
 client.on_connect = on_connect
 client.on_message = on_message
 client.connect(BROKER_HOST, BROKER_PORT, keepalive=60)
+client.loop_start()
 
-client.loop_forever()
+try:
+    while True:
+        retry_buffered_messages()
+        time.sleep(5)
+except KeyboardInterrupt:
+    print("\nStopping gateway...")
+    client.loop_stop()
+    client.disconnect()
