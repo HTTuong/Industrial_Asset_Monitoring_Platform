@@ -1,9 +1,25 @@
 import paho.mqtt.client as mqtt
 import json
+import requests
 
 BROKER_HOST = "localhost"
 BROKER_PORT = 1883
 SUBSCRIBE_TOPIC = "factory/#"
+BACKEND_URL = "http://localhost:8000"
+
+
+def forward_to_backend(reading: dict) -> bool:
+    try:
+        response = requests.post(f"{BACKEND_URL}/telemetry", json=reading, timeout=3)
+        if response.status_code == 201:
+            print(f"Forwarded: {reading['device_id']}")
+            return True
+        else:
+            print(f"Backend rejected ({response.status_code}): {response.text}")
+            return False
+    except requests.exceptions.ConnectionError:
+        print("Backend unreachable")
+        return False
 
 
 def on_connect(client, userdata, flags, reason_code, properties):
@@ -18,7 +34,7 @@ def on_message(client, userdata, msg):
         print(f"Malformed JSON on {msg.topic}, dropping message")
         return
 
-    print(f"Received from {msg.topic}: {reading}")
+    forward_to_backend(reading)
 
 
 client = mqtt.Client(mqtt.CallbackAPIVersion.VERSION2)
