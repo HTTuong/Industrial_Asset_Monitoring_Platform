@@ -5,4 +5,7 @@ class Settings(BaseSettings):
     mqtt_broker_host: str = "localhost"
     mqtt_broker_port: int = 1883
 
+    temperature_threshold: float = 80.0
+    vibration_threshold: float = 8.0
+
 settings = Settings()
