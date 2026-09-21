@@ -1,9 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException
-from sqlalchemy.orm import Session
-from app.database import get_db
-from app import models, schemas
-
-router = APIRouter(prefix="/telemetry", tags=["telemetry"])
+from app.anomaly import detect_anomaly
 
 @router.post("", response_model=schemas.TelemetryResponse, status_code=201)
 def ingest_telemetry(data: schemas.TelemetryCreate, db: Session = Depends(get_db)):
@@ -25,4 +20,9 @@ def ingest_telemetry(data: schemas.TelemetryCreate, db: Session = Depends(get_db
 
     db.commit()
     db.refresh(new_telemetry)
+
+    anomaly_result = detect_anomaly(data.temperature, data.vibration)
+    if anomaly_result.is_anomaly:
+        print(f"[ANOMALY] Device {data.device_id}: {anomaly_result.reasons}")
+
     return new_telemetry
