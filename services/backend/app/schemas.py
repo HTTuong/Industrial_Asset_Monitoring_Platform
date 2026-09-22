@@ -49,3 +49,14 @@ class TelemetryResponse(BaseModel):
 
     class Config:
         from_attributes = True
+
+class AlertResponse(BaseModel):
+    id: int
+    device_id: str
+    alert_type: str
+    message: str
+    resolved: bool
+    created_at: datetime
+
+    class Config:
+        from_attributes = True
