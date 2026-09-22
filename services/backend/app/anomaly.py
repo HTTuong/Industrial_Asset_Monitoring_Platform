@@ -1,20 +1,30 @@
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from app.config import settings
 
 
 @dataclass
 class AnomalyResult:
-    is_anomaly: bool
-    reasons: list[str]
+    anomalies: dict[str, str] = field(default_factory=dict)  # alert_type -> message
+    normal: list[str] = field(default_factory=list)         
 
 
 def detect_anomaly(temperature: float | None, vibration: float | None) -> AnomalyResult:
-    reasons = []
+    result = AnomalyResult()
 
-    if temperature is not None and temperature > settings.temperature_threshold:
-        reasons.append(f"Temperature {temperature}°C exceeds threshold {settings.temperature_threshold}°C")
+    if temperature is not None:
+        if temperature > settings.temperature_threshold:
+            result.anomalies["high_temperature"] = (
+                f"Temperature {temperature}°C exceeds threshold {settings.temperature_threshold}°C"
+            )
+        else:
+            result.normal.append("high_temperature")
 
-    if vibration is not None and vibration > settings.vibration_threshold:
-        reasons.append(f"Vibration {vibration} exceeds threshold {settings.vibration_threshold}")
+    if vibration is not None:
+        if vibration > settings.vibration_threshold:
+            result.anomalies["high_vibration"] = (
+                f"Vibration {vibration} exceeds threshold {settings.vibration_threshold}"
+            )
+        else:
+            result.normal.append("high_vibration")
 
-    return AnomalyResult(is_anomaly=len(reasons) > 0, reasons=reasons)
+    return result
