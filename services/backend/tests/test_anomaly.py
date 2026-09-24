@@ -46,3 +46,17 @@ def test_temperature_just_below_threshold_is_not_anomaly():
     result = detect_anomaly(temperature=79.9, vibration=3.0)
 
     assert "high_temperature" not in result.anomalies
+
+def test_missing_temperature_does_not_crash():
+    result = detect_anomaly(temperature=None, vibration=9.5)
+
+    assert "high_temperature" not in result.anomalies
+    assert "high_temperature" not in result.normal 
+    assert "high_vibration" in result.anomalies
+
+
+def test_both_values_missing():
+    result = detect_anomaly(temperature=None, vibration=None)
+
+    assert result.anomalies == {}
+    assert result.normal == []
