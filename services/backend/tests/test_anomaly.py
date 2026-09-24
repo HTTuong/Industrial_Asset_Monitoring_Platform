@@ -29,3 +29,21 @@ def test_both_thresholds_exceeded_together():
     assert "high_temperature" in result.anomalies
     assert "high_vibration" in result.anomalies
     assert len(result.anomalies) == 2
+
+def test_temperature_exactly_at_threshold_is_not_anomaly():
+    # Ngưỡng là > 80.0, nên đúng 80.0 KHÔNG được coi là anomaly
+    result = detect_anomaly(temperature=80.0, vibration=3.0)
+
+    assert "high_temperature" not in result.anomalies
+
+
+def test_temperature_just_above_threshold_is_anomaly():
+    result = detect_anomaly(temperature=80.1, vibration=3.0)
+
+    assert "high_temperature" in result.anomalies
+
+
+def test_temperature_just_below_threshold_is_not_anomaly():
+    result = detect_anomaly(temperature=79.9, vibration=3.0)
+
+    assert "high_temperature" not in result.anomalies
