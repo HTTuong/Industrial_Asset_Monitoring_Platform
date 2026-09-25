@@ -1,4 +1,5 @@
 from fastapi import FastAPI
+from fastapi.staticfiles import StaticFiles
 from fastapi.middleware.cors import CORSMiddleware
 from app.database import Base, engine
 from app import models
@@ -18,6 +19,8 @@ Base.metadata.create_all(bind=engine)
 app.include_router(devices.router)
 app.include_router(telemetry.router)
 app.include_router(alerts.router)
+
+app.mount("/dashboard", StaticFiles(directory="static", html=True), name="dashboard")
 
 @app.get("/health")
 def health_check():

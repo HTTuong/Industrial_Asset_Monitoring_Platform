@@ -6,7 +6,7 @@ import time
 BROKER_HOST = "localhost"
 BROKER_PORT = 1883
 
-SENSORS = ["sensor-001", "sensor-002", "sensor-003"]
+SENSORS = ["sensor-001"]
 
 client = mqtt.Client(mqtt.CallbackAPIVersion.VERSION2)
 client.connect(BROKER_HOST, BROKER_PORT, keepalive=60)

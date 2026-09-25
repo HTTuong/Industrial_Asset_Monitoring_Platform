@@ -53,6 +53,13 @@ Verified manually: stopping Mosquitto for ~20–30 seconds while the simulator c
 
 **Automation.** Pending - this will become the centerpiece of the Resilience group: "MQTT broker unavailable → recovers" (T21–T22) and "verify buffered messages eventually arrive" (T27–T28).
 
+### 4. StaticFiles html=True mode requires the file to be named exactly "index.html"
+
+**Risk.** The dashboard file was created as `dashboard.html`, expecting FastAPI's `StaticFiles(html=True)` to auto-serve it at the mounted directory URL (`/dashboard/`). This does not work — Starlette's html mode only auto-serves a file literally named `index.html` for directory-style requests; any other filename returns 404 even if it's
+the only file present.
+
+**Resolution.** Renamed `dashboard.html` → `index.html`. `dashboard.js` filename unaffected since it's referenced explicitly by `<script src="dashboard.js">`, not relied upon for directory-index auto-discovery.
+
 ---
 
 ## Planned risk coverage by test group
